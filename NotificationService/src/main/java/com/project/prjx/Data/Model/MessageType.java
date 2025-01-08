@@ -1,0 +1,27 @@
+package com.project.prjx.Data.Model;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public enum MessageType {
+    ACTIVATION,
+    PASSWORD_RESET,
+    RESERVATION_CONFIRMED,
+    RESERVATION_CANCELLED,
+    REMINDER;
+
+    @JsonCreator
+    public static MessageType fromString(String value) {
+        for (MessageType type : MessageType.values()) {
+            if (type.name().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("Invalid message type: " + value);
+    }
+
+    @JsonValue
+    public String toJson() {
+        return name();
+    }
+}
