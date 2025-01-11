@@ -44,9 +44,6 @@ public class RestaurantService {
 
     public List<RestaurantDto> getRestaurantsPublic(KitchenType kitchenType, Boolean smokingAllowed, Integer minCapacity, LocalDateTime dateTime) {
         return Mappers.RestaurantMapper.reverseMap(restaurantRepository.findByCriteria(kitchenType, smokingAllowed, minCapacity));
-        List<SchedulePerDay> list = schedulePerDayRepository.findAllByRestaurant_Idi
-        //add datetime exclusion because of the json schedule
-        //adjust mappers to the new types and changes to classes
     }
 
     private Map<String, Map<String, String>> filteredSchedule(Map<String, Map<String, String>> schedule, LocalDateTime dateTime) {
@@ -106,7 +103,6 @@ public class RestaurantService {
         exists(restaurant, Restaurant.class);
         isOwned(manager, restaurant);
 
-        //also delete its tables types scheduler schedulesperday and zones
         restaurantRepository.deleteById(restaurantId);
         return Mappers.RestaurantMapper.reverseMap(restaurant);
     }
