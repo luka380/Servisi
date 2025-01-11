@@ -11,8 +11,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ClientDto extends BaseUserDto implements Mapper<ClientDto, Client> {
     @Builder
-    public ClientDto(UUID id, String username, String password, EmailDto email, LocalDateTime birthday, String firstName, String lastName, Number phoneNumber, Boolean isEnabled) {
-        super(id, username, password, email, birthday, firstName, lastName, phoneNumber, isEnabled, "ROLE_USER");
+    public ClientDto(UUID id, String username, String password, EmailDto email, LocalDateTime birthday, String firstName, String lastName, Boolean isEnabled) {
+        super(id, username, password, email, birthday, firstName, lastName, isEnabled, "ROLE_USER");
     }
 
 

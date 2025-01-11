@@ -12,5 +12,5 @@ import java.util.List;
 public interface SchedulePerDayRepository extends JpaRepository<SchedulePerDay, Integer> {
     SchedulePerDay findAllByRestaurant_Id(int restaurantId);
 
-    List<SchedulePerDay> findByRestaurant_IdAndDate(int restaurantId, LocalDate date);
+    SchedulePerDay findAllByRestaurant_Id(int restaurantId, LocalDate date);
 }

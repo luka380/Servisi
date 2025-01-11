@@ -1,8 +1,6 @@
 package com.project.prjx.Data.Model.Entity.Notifications;
 
-import com.project.prjx.Data.Model.Entity.Restaurants.Reservation;
-import com.project.prjx.Data.Model.Entity.Restaurants.Restaurant;
-import com.project.prjx.Data.Model.Entity.Users.BaseUser;
+
 import com.project.prjx.Data.Model.MessageType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -20,17 +18,13 @@ import java.util.UUID;
 @Entity
 @DiscriminatorValue("RESERVATION")
 public class ReservationNotification extends BaseNotification {
-    @ManyToOne
-    @JoinColumn(name = "restaurant_id")
-    private Restaurant restaurantId;
-    @ManyToOne
-    @JoinColumn(name = "reservation_id")
-    private Reservation reservationId;
+    private int restaurantId;
+    private int reservationId;
     private int numberOfSeats;
 
     @Builder
-    public ReservationNotification(UUID id, MessageType type, BaseUser receiverId, LocalDateTime createdAt, boolean isRead, Restaurant restaurantId, Reservation reservationId, int numberOfSeats) {
-        super(id, type, receiverId, createdAt, isRead);
+    public ReservationNotification(UUID id, LocalDateTime createdAt, boolean isRead, MessageType type, String restaurantName, String restaurantAddress, String reservationTime, String reservationDate, String reservationStatus, String receiverEmail, String receiverName, String receiverPhone, UUID receiverId, String senderName, int restaurantId, int reservationId, int numberOfSeats) {
+        super(id, createdAt, isRead, type, restaurantName, restaurantAddress, reservationTime, reservationDate, reservationStatus, receiverEmail, receiverName, receiverPhone, receiverId, senderName);
         this.restaurantId = restaurantId;
         this.reservationId = reservationId;
         this.numberOfSeats = numberOfSeats;

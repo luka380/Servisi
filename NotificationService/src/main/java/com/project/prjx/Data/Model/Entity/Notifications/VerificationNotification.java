@@ -1,6 +1,5 @@
 package com.project.prjx.Data.Model.Entity.Notifications;
 
-import com.project.prjx.Data.Model.Entity.Users.BaseUser;
 import com.project.prjx.Data.Model.MessageType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -21,8 +20,8 @@ public class VerificationNotification extends BaseNotification {
     private String verificationCode;
 
     @Builder
-    public VerificationNotification(UUID id, MessageType type, BaseUser receiverId, LocalDateTime createdAt, boolean isRead, String verificationCode) {
-        super(id, type, receiverId, createdAt, isRead);
+    public VerificationNotification(UUID id, LocalDateTime createdAt, boolean isRead, MessageType type, String restaurantName, String restaurantAddress, String reservationTime, String reservationDate, String reservationStatus, String receiverEmail, String receiverName, String receiverPhone, UUID receiverId, String senderName, String verificationCode) {
+        super(id, createdAt, isRead, type, restaurantName, restaurantAddress, reservationTime, reservationDate, reservationStatus, receiverEmail, receiverName, receiverPhone, receiverId, senderName);
         this.verificationCode = verificationCode;
     }
 }

@@ -20,14 +20,16 @@ public class UserAuthentication implements Authentication {
     private final String validationMethod;
     private final Boolean isAuthenticated;
     private final Boolean isEnabled;
+    private final String token;
 
-    public UserAuthentication(BaseUserDto user, String username, Collection<? extends GrantedAuthority> authorities, String validationMethod, Boolean isAuthenticated, Boolean isEnabled) {
+    public UserAuthentication(BaseUserDto user, String username, Collection<? extends GrantedAuthority> authorities, String validationMethod, Boolean isAuthenticated, Boolean isEnabled, String token) {
         this.user = user;
         this.username = username;
         this.authorities = authorities;
         this.validationMethod = validationMethod;
         this.isAuthenticated = isAuthenticated;
         this.isEnabled = isEnabled;
+        this.token = token;
     }
 
     @Override

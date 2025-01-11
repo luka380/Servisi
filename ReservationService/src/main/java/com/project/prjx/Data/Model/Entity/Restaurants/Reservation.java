@@ -1,11 +1,12 @@
 package com.project.prjx.Data.Model.Entity.Restaurants;
 
-import com.project.prjx.Data.Model.Entity.Users.Client;
 import com.project.prjx.Data.Model.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"restaurant_id", "tables_id", "startDate"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"restaurant_id", "tables_id", "date"}))
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +28,8 @@ public class Reservation {
     private Status status;
     private String note;
     private int numOfGuests;
-    @ManyToOne
-    @JoinColumn(name = "client_id", nullable = true)
-    private Client client;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private UUID clientId;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private LocalDate date;
 }

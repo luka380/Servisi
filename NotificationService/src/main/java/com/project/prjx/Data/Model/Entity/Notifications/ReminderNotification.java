@@ -1,6 +1,5 @@
 package com.project.prjx.Data.Model.Entity.Notifications;
 
-import com.project.prjx.Data.Model.Entity.Users.BaseUser;
 import com.project.prjx.Data.Model.MessageType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -14,8 +13,9 @@ import java.util.UUID;
 @Entity
 @DiscriminatorValue("REMINDER")
 public class ReminderNotification extends BaseNotification {
+
     @Builder
-    public ReminderNotification(UUID id, MessageType type, BaseUser receiverId, LocalDateTime createdAt, boolean isRead) {
-        super(id, type, receiverId, createdAt, isRead);
+    public ReminderNotification(UUID id, LocalDateTime createdAt, boolean isRead, MessageType type, String restaurantName, String restaurantAddress, String reservationTime, String reservationDate, String reservationStatus, String receiverEmail, String receiverName, String receiverPhone, UUID receiverId, String senderName) {
+        super(id, createdAt, isRead, type, restaurantName, restaurantAddress, reservationTime, reservationDate, reservationStatus, receiverEmail, receiverName, receiverPhone, receiverId, senderName);
     }
 }

@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ManagerRegistrationRequest extends ClientRegistrationRequest {
-    @NotBlank
-    private String restaurantName;
     @NotNull
     private LocalDateTime hireDate;
 }

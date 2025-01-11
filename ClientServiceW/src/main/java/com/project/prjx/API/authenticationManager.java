@@ -1,35 +1,36 @@
 package com.project.prjx.API;
 
+import com.project.prjx.Data.Model.Dto.Notification.NotificationData;
 import com.project.prjx.Data.Model.Dto.Users.EmailDto;
 import com.project.prjx.Data.Model.Dto.Users.LoginRequest;
 import com.project.prjx.Data.Model.Dto.Users.ManagerDto;
 import com.project.prjx.Data.Model.Dto.Users.ManagerRegistrationRequest;
+import com.project.prjx.Data.Model.MessageType;
 import com.project.prjx.Exceptions.*;
 import com.project.prjx.Security.JwtUtils;
-import com.project.prjx.Services.ServiceImpl.MessagingServiceImpl;
-import com.project.prjx.Services.ServiceImpl.VerificationServiceImpl;
-import com.project.prjx.Services.ServiceInterface.ManagerServiceInterface;
+import com.project.prjx.Services.ManagerService;
+import com.project.prjx.Services.MessagingService;
+import com.project.prjx.Services.VerificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RequestMapping("/auth/Manager")
 @RestController
 public class authenticationManager {
-    private final ManagerServiceInterface managerService;
-    private final MessagingServiceImpl messagingService;
-    private final VerificationServiceImpl verificationServiceImpl;
+    private final ManagerService managerService;
+    private final MessagingService messagingService;
+    private final VerificationService verificationService;
     private final JwtUtils jwtUtils;
 
-    public authenticationManager(ManagerServiceInterface managerService, MessagingServiceImpl messagingService, VerificationServiceImpl verificationServiceImpl, JwtUtils jwtUtils) {
+    public authenticationManager(ManagerService managerService, MessagingService messagingService, VerificationService verificationService, JwtUtils jwtUtils) {
         this.managerService = managerService;
         this.messagingService = messagingService;
-        this.verificationServiceImpl = verificationServiceImpl;
+        this.verificationService = verificationService;
         this.jwtUtils = jwtUtils;
     }
 
@@ -65,48 +66,33 @@ public class authenticationManager {
                 .lastName(registrationRequest.getLastName())
                 .isEnabled(true)
                 .birthday(null)
-                .phoneNumber(null)
                 .username(registrationRequest.getUsername())
                 .password(registrationRequest.getPassword())
-                .email(new EmailDto(null, registrationRequest.getEmail(), false))
+                .email(new EmailDto(0, registrationRequest.getEmail(), false))
                 .hiringDate(registrationRequest.getHireDate())
-                .restaurant(null)
                 .build();
 
         ManagerDto newManager = managerService.saveUser(c);
-        String verificationCode = verificationServiceImpl.createVerification(newManager.getEmail());
+        String verificationCode = verificationService.createVerification(newManager.getEmail());
 
-        messagingService.sendAsyncMessage(verificationCode);
-        messagingService.sendAsyncMessage("");//greeting for registration
+        NotificationData data = NotificationData.builder()
+                .receiverEmail(newManager.getEmail().getEmail())
+                .receiverName(newManager.getFirstName() + " " + newManager.getLastName())
+                .receiverId(newManager.getId().toString())
+                .securityCode(verificationCode)
+                .type(MessageType.ACTIVATION)
+                .build();
+
+        messagingService.sendAsyncMessage(data);
 
         return ResponseEntity.ok("Successfully registered");
-    }
-
-    @PostMapping("/Finduser")
-    public ResponseEntity<String> findUser(@RequestBody Map<String, String> body, HttpServletRequest request, HttpServletResponse response) {
-        String email = body.get("email");
-        if (!isValidEmail(email)) {
-            throw new RuntimeException("Invalid email");
-        }
-
-        List<ManagerDto> clients = managerService.getManagersByEmail(email);
-
-        StringBuilder builder = new StringBuilder();
-
-        clients.forEach(c->{
-            builder.append(c.getUsername()).append("\n");
-        });
-
-        messagingService.sendAsyncMessage(builder.toString());
-
-        return ResponseEntity.ok("Account data will be sent to email");
     }
 
     @PostMapping("/SendPassReset")
     public ResponseEntity<String> sendResetReq(@RequestBody Map<String, String> body, HttpServletResponse response) {
         String username = body.get("username");
 
-        if(username == null || username.isBlank()){
+        if (username == null || username.isBlank()) {
             return ResponseEntity.badRequest().body("Username is required");
         }
 
@@ -118,8 +104,18 @@ public class authenticationManager {
             throw new AccountDisabledException();
         }
 
-        String code = verificationServiceImpl.createPassResReq(manager);
-        messagingService.sendAsyncMessage(code);
+        String code = verificationService.createPassResReq(manager);
+
+        NotificationData data = NotificationData.builder()
+                .receiverEmail(manager.getEmail().getEmail())
+                .receiverName(manager.getFirstName() + " " + manager.getLastName())
+                .receiverId(manager.getId().toString())
+                .securityCode(code)
+                .type(MessageType.PASSWORD_RESET)
+                .build();
+
+        messagingService.sendAsyncMessage(data);
+
         return ResponseEntity.ok("Verification code sent to your email");
     }
 
@@ -128,12 +124,11 @@ public class authenticationManager {
 
         String password = body.get("password");
 
-        if(password == null || password.isBlank()){
+        if (password == null || password.isBlank()) {
             return ResponseEntity.badRequest().body("Password is required");
         }
 
-        if(verificationServiceImpl.verifyPasswordChange(code, password)){
-            messagingService.sendAsyncMessage("Password successfully changed");
+        if (verificationService.verifyPasswordChange(code, password)) {
             return ResponseEntity.ok("Password successfully changed");
         }
 
@@ -142,8 +137,8 @@ public class authenticationManager {
 
     @GetMapping("/Verification/{code}")
     public ResponseEntity<String> verify(@PathVariable String code, HttpServletRequest request, HttpServletResponse response) {
-        boolean state = verificationServiceImpl.verifyVerificationCode(code);
-        if(state){
+        boolean state = verificationService.verifyVerificationCode(code);
+        if (state) {
             return ResponseEntity.ok("Successfully verified");
         }
         return ResponseEntity.badRequest().body("Verification code is invalid");
@@ -163,12 +158,22 @@ public class authenticationManager {
 
         if (manager.getEmail().isVerified()) {
             return ResponseEntity.badRequest().body("Email already verified");
-        } else if (!manager.getEmail().email().equals(loginRequest.getEmail())) {
+        } else if (!manager.getEmail().getEmail().equals(loginRequest.getEmail())) {
             return ResponseEntity.badRequest().body("");
         }
 
-        String code = verificationServiceImpl.createVerification(manager.getEmail());
-        messagingService.sendAsyncMessage(code);
+        String code = verificationService.createVerification(manager.getEmail());
+
+        NotificationData data = NotificationData.builder()
+                .receiverEmail(manager.getEmail().getEmail())
+                .receiverName(manager.getFirstName() + " " + manager.getLastName())
+                .receiverId(manager.getId().toString())
+                .securityCode(code)
+                .type(MessageType.ACTIVATION)
+                .build();
+
+        messagingService.sendAsyncMessage(data);
+
         return ResponseEntity.ok("Verification code sent to your email");
     }
 

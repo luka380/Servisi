@@ -9,9 +9,8 @@ public class RabbitMQProducer {
     @Autowired
     private AmqpTemplate amqpTemplate;
 
-    public void sendMessage(String queue, String message) {
+    public void sendMessage(String queue, Object message) {
         amqpTemplate.convertAndSend(queue, message);
-        System.out.println("Sent: " + message);
     }
 }
 

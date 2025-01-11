@@ -20,7 +20,6 @@ public class BaseUserDto {
     private LocalDateTime birthday;
     private String firstName;
     private String lastName;
-    private Number phoneNumber;
     private Boolean isEnabled;
     private String role;
 }

@@ -2,7 +2,7 @@ package com.project.prjx.Services;
 
 import com.project.prjx.Data.Mappers.Mappers;
 import com.project.prjx.Data.Model.Dto.Restaurants.*;
-import com.project.prjx.Data.Model.Dto.Users.ManagerDto;
+import com.project.prjx.Data.Model.Dto.Users.BaseUserDto;
 import com.project.prjx.Data.Model.Entity.KitchenType;
 import com.project.prjx.Data.Model.Entity.Restaurants.*;
 import com.project.prjx.Data.Repositories.*;
@@ -27,9 +27,8 @@ public class RestaurantService {
     private final ScheduleRepository scheduleRepository;
     private final SchedulePerDayRepository schedulePerDayRepository;
     private final RewardsRepository rewardsRepository;
-    private final ManagerServiceInterface managerService;
 
-    public RestaurantService(RestaurantRepository restaurantRepository, TableRepository tableRepository, ZoneRepository zoneRepository, TableTypeRepository tableTypeRepository, ScheduleRepository scheduleRepository, SchedulePerDayRepository schedulePerDayRepository, RewardsRepository rewardsRepository, ManagerServiceInterface managerService) {
+    public RestaurantService(RestaurantRepository restaurantRepository, TableRepository tableRepository, ZoneRepository zoneRepository, TableTypeRepository tableTypeRepository, ScheduleRepository scheduleRepository, SchedulePerDayRepository schedulePerDayRepository, RewardsRepository rewardsRepository) {
         this.restaurantRepository = restaurantRepository;
         this.tableRepository = tableRepository;
         this.zoneRepository = zoneRepository;
@@ -37,15 +36,15 @@ public class RestaurantService {
         this.scheduleRepository = scheduleRepository;
         this.schedulePerDayRepository = schedulePerDayRepository;
         this.rewardsRepository = rewardsRepository;
-        this.managerService = managerService;
     }
 
-    private ManagerDto getManager() {
-        return managerService.getUserById(((UserAuthentication) SecurityContextHolder.getContext().getAuthentication()).getUser().getId());
+    private BaseUserDto getManager() {
+        return ((UserAuthentication) SecurityContextHolder.getContext().getAuthentication()).getUser();
     }
 
     public List<RestaurantDto> getRestaurantsPublic(KitchenType kitchenType, Boolean smokingAllowed, Integer minCapacity, LocalDateTime dateTime) {
-        return restaurantRepository.findByCriteria(kitchenType, smokingAllowed, minCapacity);
+        return Mappers.RestaurantMapper.reverseMap(restaurantRepository.findByCriteria(kitchenType, smokingAllowed, minCapacity));
+        List<SchedulePerDay> list = schedulePerDayRepository.findAllByRestaurant_Idi
         //add datetime exclusion because of the json schedule
         //adjust mappers to the new types and changes to classes
     }
@@ -73,18 +72,18 @@ public class RestaurantService {
     }
 
     public List<RestaurantDto> getRestaurants() {
-        ManagerDto manager = getManager();
-        return Mappers.RestaurantMapper.reverseMap(restaurantRepository.findAllByOwner_IdOrManager_Id(manager.getId(), manager.getId()));
+        BaseUserDto manager = getManager();
+        return Mappers.RestaurantMapper.reverseMap(restaurantRepository.findAllByOwnerIdOrManagerId(manager.getId(), manager.getId()));
     }
 
     public RestaurantDto addRestaurant(@Valid RestaurantDto restaurantDto) {
-        restaurantDto.setManager(getManager());
-        restaurantDto.setOwner(getManager());
+        restaurantDto.setManagerId(getManager().getId());
+        restaurantDto.setOwnerId(getManager().getId());
         return Mappers.RestaurantMapper.reverseMap(restaurantRepository.save(Mappers.RestaurantMapper.map(restaurantDto)));
     }
 
     public RestaurantDto updateRestaurant(@Valid RestaurantDto restaurantDto, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -101,7 +100,7 @@ public class RestaurantService {
     }
 
     public RestaurantDto removeRestaurant(int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -113,7 +112,7 @@ public class RestaurantService {
     }
 
     public List<TableDto> getTables(int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -123,7 +122,7 @@ public class RestaurantService {
     }
 
     public TableDto addTable(@Valid TableDto tableDto, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -136,7 +135,7 @@ public class RestaurantService {
     }
 
     public TableDto removeTable(int tableId, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -151,7 +150,7 @@ public class RestaurantService {
     }
 
     public List<ZoneDto> getZones(int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -161,7 +160,7 @@ public class RestaurantService {
     }
 
     public ZoneDto addZone(@Valid ZoneDto zoneDto, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -174,7 +173,7 @@ public class RestaurantService {
     }
 
     public ZoneDto removeZone(int zoneId, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -189,7 +188,7 @@ public class RestaurantService {
     }
 
     public List<TableTypeDto> getTableTypes(int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -199,7 +198,7 @@ public class RestaurantService {
     }
 
     public TableTypeDto newTableType(@Valid TableTypeDto tableTypeDto, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -212,7 +211,7 @@ public class RestaurantService {
     }
 
     public TableTypeDto removeTableType(int tableTypeId, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -226,7 +225,7 @@ public class RestaurantService {
     }
 
     public RewardsDto getRewards(int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -236,7 +235,7 @@ public class RestaurantService {
     }
 
     public RewardsDto newReward(@Valid RewardsDto rewardsDto, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -250,7 +249,7 @@ public class RestaurantService {
     }
 
     public RewardsDto deleteReward(int rewardId, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -265,7 +264,7 @@ public class RestaurantService {
     }
 
     public List<ScheduleDto> getSchedules(int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -275,7 +274,7 @@ public class RestaurantService {
     }
 
     public ScheduleDto newSchedule(@Valid ScheduleDto scheduleDto, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -291,7 +290,7 @@ public class RestaurantService {
     }
 
     public ScheduleDto removeSchedule(int scheduleId, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -306,7 +305,7 @@ public class RestaurantService {
     }
 
     public SchedulePerDayDto getSchedulesPerDay(int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -316,7 +315,7 @@ public class RestaurantService {
     }
 
     public SchedulePerDayDto newSchedulePerDay(@Valid SchedulePerDayDto schedulePerDayDto, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -332,7 +331,7 @@ public class RestaurantService {
     }
 
     public SchedulePerDayDto updateSchedulePerDay(@Valid SchedulePerDayDto schedulePerDayDto, int schedulePerDayId, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -352,7 +351,7 @@ public class RestaurantService {
     }
 
     public SchedulePerDayDto deleteSchedulePerDay(int schedulePerDayId, int restaurantId) {
-        ManagerDto manager = getManager();
+        BaseUserDto manager = getManager();
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
 
         exists(restaurant, Restaurant.class);
@@ -366,15 +365,15 @@ public class RestaurantService {
         return Mappers.SchedulePerDayMapper.reverseMap(schedulePerDay);
     }
 
-    private boolean isOwned(ManagerDto manager, Restaurant restaurant) {
-        if (manager.getId().equals(restaurant.getOwner().getId())) {
+    private boolean isOwned(BaseUserDto manager, Restaurant restaurant) {
+        if (manager.getId().equals(restaurant.getOwnerId())) {
             return true;
         }
         throw new RuntimeException("You are not authorized to do this action");
     }
 
-    private void isManaged(ManagerDto manager, Restaurant restaurant) {
-        if (manager.getId().equals(restaurant.getManager().getId()) || isOwned(manager, restaurant)) {
+    private void isManaged(BaseUserDto manager, Restaurant restaurant) {
+        if (manager.getId().equals(restaurant.getOwnerId()) || isOwned(manager, restaurant)) {
             return;
         }
         throw new RuntimeException("You are not authorized to do this action");

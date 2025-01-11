@@ -2,7 +2,6 @@ package com.project.prjx.API;
 
 import com.project.prjx.Data.Model.Dto.Restaurants.*;
 import com.project.prjx.Data.Model.Entity.KitchenType;
-import com.project.prjx.Services.ManagerServiceInterface;
 import com.project.prjx.Services.RestaurantService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +14,9 @@ import java.util.List;
 @RequestMapping("/restaurant")
 public class RestaurantManagement {
     private final RestaurantService restaurantService;
-    private final ManagerServiceInterface managerService;
 
-    public RestaurantManagement(RestaurantService restaurantService, ManagerServiceInterface managerService) {
+    public RestaurantManagement(RestaurantService restaurantService) {
         this.restaurantService = restaurantService;
-        this.managerService = managerService;
     }
 
     @GetMapping("/public")

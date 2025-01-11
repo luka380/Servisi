@@ -3,9 +3,6 @@ package com.project.prjx.Services;
 import com.project.prjx.Data.Model.Dto.Notifications.NotificationData;
 import com.project.prjx.Data.Model.Dto.Users.BaseUserDto;
 import com.project.prjx.Data.Model.Entity.Notifications.*;
-import com.project.prjx.Data.Model.Entity.Restaurants.Reservation;
-import com.project.prjx.Data.Model.Entity.Restaurants.Restaurant;
-import com.project.prjx.Data.Model.Entity.Users.BaseUser;
 import com.project.prjx.Data.Model.MessageType;
 import com.project.prjx.Data.Repositories.BaseNotificationRepository;
 import com.project.prjx.Data.Repositories.NotificationTemplateRepository;
@@ -30,26 +27,24 @@ public class NotificationService {
     }
 
     public NotificationData save(NotificationData notificationData) {
-        BaseUser user = new BaseUser();
-        user.setId(UUID.fromString(notificationData.getReceiverId()));
         BaseNotification baseNotification = switch (notificationData.getType()) {
             case ACTIVATION, PASSWORD_RESET -> VerificationNotification.builder()
-                    .receiverId(user)
+                    .receiverId(UUID.fromString(notificationData.getReceiverId()))
                     .verificationCode(notificationData.getSecurityCode())
                     .type(notificationData.getType())
                     .isRead(false)
                     .build();
             case RESERVATION_CANCELLED, RESERVATION_CONFIRMED -> ReservationNotification.builder()
-                    .receiverId(user)
+                    .receiverId(UUID.fromString(notificationData.getReceiverId()))
                     .isRead(false)
                     .type(notificationData.getType())
                     .numberOfSeats(notificationData.getNumberOfSeats())
-                    .reservationId(Reservation.builder().id(Integer.parseInt(notificationData.getReservationId())).build())
-                    .restaurantId(Restaurant.builder().id(Integer.parseInt(notificationData.getRestaurantId())).build())
+                    .reservationId(Integer.parseInt(notificationData.getReservationId()))
+                    .restaurantId(Integer.parseInt(notificationData.getRestaurantId()))
                     .build();
             case REMINDER -> ReminderNotification.builder()
                     .isRead(false)
-                    .receiverId(user)
+                    .receiverId(UUID.fromString(notificationData.getReceiverId()))
                     .type(notificationData.getType())
                     .build();
         };
@@ -59,7 +54,7 @@ public class NotificationService {
     }
 
     public List<BaseNotification> getByFilter(MessageType type, LocalDateTime startDate, LocalDateTime endDate, String email, BaseUserDto user) {
-        return notificationRepository.findByCriteria(String.valueOf(type), startDate, endDate, email, user.getId());
+        return notificationRepository.findByCriteria(type==null?null:type.name(), startDate, endDate, email, user.getId());
     }
 
     public List<NotificationData> getAll() {

@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.NoArgsConstructor;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -62,7 +63,8 @@ public class JwtUtils {
 
     public String generateToken(BaseUserDto userDetails) {
         Map<String, Object> map = new HashMap<>();
-        map.put("email", userDetails.getEmail().email());
+        map.put("email", userDetails.getEmail().getEmail());
+        map.put("id", userDetails.getId());
         return createToken(map, userDetails);
     }
 
@@ -90,7 +92,7 @@ public class JwtUtils {
                     .build()
                     .parseClaimsJws(token);
 
-            return isTokenExpired(token);
+            return true;
         } catch (Exception e) {
             return false;
         }

@@ -1,9 +1,14 @@
 package com.project.prjx.Data.Model.Dto.Users;
 
-import lombok.Builder;
+import lombok.*;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public record EmailDto (
-        Integer id,
-        String email,
-        Boolean isVerified) {}
+public class EmailDto {
+    int id;
+    String email;
+    boolean isVerified;
+}

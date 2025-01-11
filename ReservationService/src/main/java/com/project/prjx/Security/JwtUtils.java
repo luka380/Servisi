@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -63,6 +60,7 @@ public class JwtUtils {
     public String generateToken(BaseUserDto userDetails) {
         Map<String, Object> map = new HashMap<>();
         map.put("email", userDetails.getEmail().email());
+        map.put("id", userDetails.getId());
         return createToken(map, userDetails);
     }
 
@@ -90,9 +88,13 @@ public class JwtUtils {
                     .build()
                     .parseClaimsJws(token);
 
-            return isTokenExpired(token);
+            return true;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public UUID extractId(String token) {
+        return extractClaim(token, claims -> UUID.fromString(claims.get("id", String.class)));
     }
 }

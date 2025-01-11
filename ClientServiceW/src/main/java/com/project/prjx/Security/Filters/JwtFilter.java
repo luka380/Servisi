@@ -1,15 +1,18 @@
 package com.project.prjx.Security.Filters;
 
-import com.project.prjx.Data.Model.Dto.Users.BaseUserDto;
 import com.project.prjx.Security.JwtUtils;
 import com.project.prjx.Security.Tokens.JwtToken;
-import com.project.prjx.Services.ServiceInterface.BaseClientServiceInterface;
+import com.project.prjx.Services.BaseUserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,12 +26,13 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
-    private final BaseClientServiceInterface<BaseUserDto> userService;
+    @Lazy
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    public JwtFilter(JwtUtils jwtUtils, BaseClientServiceInterface<BaseUserDto> userService) {
+    public JwtFilter(JwtUtils jwtUtils) {
         this.jwtUtils = jwtUtils;
-        this.userService = userService;
     }
 
     @Override
@@ -39,11 +43,13 @@ public class JwtFilter extends OncePerRequestFilter {
         if (token.isPresent() && SecurityContextHolder.getContext().getAuthentication() == null) {
             JwtToken jwtToken = new JwtToken(token.get());
             SecurityContextHolder.getContext().setAuthentication(jwtToken);
+            Authentication auth = authenticationManager.authenticate(jwtToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
         filterChain.doFilter(request, response);
     }
 
-    protected Optional<String> getToken(HttpServletRequest request) throws ServletException, IOException {
+    protected Optional<String> getToken(HttpServletRequest request) {
         String authHeader = request.getHeader(AUTHORIZATION);
 
         if (authHeader == null || !authHeader.startsWith("Bearer")) {

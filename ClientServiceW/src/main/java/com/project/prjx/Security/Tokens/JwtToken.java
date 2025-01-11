@@ -8,7 +8,6 @@ import org.springframework.security.core.GrantedAuthority;
 import javax.security.auth.Subject;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter

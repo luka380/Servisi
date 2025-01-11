@@ -20,9 +20,9 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Integer>
             "WHERE (:kitchenType IS NULL OR :kitchenType = r.kitchenType) AND " +
             "(:smoking IS NULL OR :smoking = z.isSmoking) AND" +
             "(:capacity IS NULL OR :capacity <= tt.seatingCapacity)")
-    List<RestaurantDto> findByCriteria(@Param("kitchenType") KitchenType kitchenType,
+    List<Restaurant> findByCriteria(@Param("kitchenType") KitchenType kitchenType,
                                        @Param("smoking") Boolean smokingAllowed,
                                        @Param("capacity") Integer minCapacity);
 
-    List<Restaurant> findAllByOwner_IdOrManager_Id(UUID ownerId, UUID managerId);
+    List<Restaurant> findAllByOwnerIdOrManagerId(UUID ownerId, UUID managerId);
 }

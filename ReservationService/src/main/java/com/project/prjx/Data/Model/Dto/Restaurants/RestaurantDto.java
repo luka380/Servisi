@@ -1,12 +1,12 @@
 package com.project.prjx.Data.Model.Dto.Restaurants;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.project.prjx.Data.Model.Dto.Users.ManagerDto;
 import com.project.prjx.Data.Model.Entity.KitchenType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -21,7 +21,7 @@ public class RestaurantDto {
     private String phone;
     @NotNull
     private KitchenType kitchenType;
-    private ManagerDto owner;
+    private UUID ownerId;
     private String description;
-    private ManagerDto manager;
+    private UUID managerId;
 }

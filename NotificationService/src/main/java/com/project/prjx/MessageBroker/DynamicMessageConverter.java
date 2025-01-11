@@ -8,6 +8,8 @@ import org.springframework.amqp.support.converter.MessageConversionException;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.lang.NonNull;
 
+import java.util.Arrays;
+
 public class DynamicMessageConverter implements MessageConverter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -20,6 +22,7 @@ public class DynamicMessageConverter implements MessageConverter {
         }
 
         try {
+            System.out.println(Arrays.toString(message.getBody()));
             return objectMapper.readValue(message.getBody(), NotificationData.class);
         } catch (Exception e) {
             throw new MessageConversionException("Failed to convert message payload to MessageWrapper", e);

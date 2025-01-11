@@ -31,12 +31,15 @@ public class Notifications {
     @GetMapping("/")
     public ResponseEntity<List<NotificationData>> getMaybeFiltered(@RequestParam(required = false) String dateFrom,
                                                                    @RequestParam(required = false) String dateTo,
-                                                                   @RequestParam(required = false) String type,
+                                                                   @RequestParam(required = false) MessageType type,
                                                                    @RequestParam(required = false) String email) {
 
         UserAuthentication user = (UserAuthentication) SecurityContextHolder.getContext().getAuthentication();
 
-        List<BaseNotification> notifications = notificationService.getByFilter(MessageType.fromString(type), LocalDateTime.parse(dateFrom), LocalDateTime.parse(dateTo), email, user.getUser());
+        List<BaseNotification> notifications = notificationService.getByFilter(
+                type,
+                dateFrom==null?LocalDateTime.now().minusYears(1):LocalDateTime.parse(dateFrom),
+                dateTo==null?LocalDateTime.now():LocalDateTime.parse(dateTo), email, user.getUser());
         return ResponseEntity.ok(Mappers.NotificationMapper.reverseMap(notifications));
     }
 
@@ -49,7 +52,7 @@ public class Notifications {
         UserAuthentication user = (UserAuthentication) SecurityContextHolder.getContext().getAuthentication();
         BaseUserDto userDto = new BaseUserDto(null, null, null, null, null, null, null, null, null, null);
 
-        List<BaseNotification> notifications = notificationService.getByFilter(MessageType.fromString(type), LocalDateTime.parse(dateFrom), LocalDateTime.parse(dateTo), email, userDto);
+        List<BaseNotification> notifications = notificationService.getByFilter(MessageType.valueOf(type), LocalDateTime.parse(dateFrom), LocalDateTime.parse(dateTo), email, userDto);
         return ResponseEntity.ok(Mappers.NotificationMapper.reverseMap(notifications));
     }
 }

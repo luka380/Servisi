@@ -1,8 +1,8 @@
 package com.project.prjx.Data.Model.Entity.Notifications;
 
-import com.project.prjx.Data.Model.Entity.Users.BaseUser;
 import com.project.prjx.Data.Model.MessageType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -20,20 +21,20 @@ public class BaseNotification {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private MessageType type;
-    @ManyToOne()
-    @JoinColumn(name = "baseuser_id", nullable = true)
-    private BaseUser receiverId;
     private LocalDateTime createdAt;
     private boolean isRead;
-
-    public BaseNotification(UUID id, MessageType type, BaseUser receiverId, LocalDateTime createdAt, boolean isRead) {
-        this.id = id;
-        this.type = type;
-        this.receiverId = receiverId;
-        this.createdAt = createdAt;
-        this.isRead = isRead;
-    }
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
+    private String restaurantName;
+    private String restaurantAddress;
+    private String reservationTime;
+    private String reservationDate;
+    private String reservationStatus;
+    private String receiverEmail;
+    private String receiverName;
+    private String receiverPhone;
+    private UUID receiverId;
+    private String senderName;
 
     @PrePersist
     protected void onCreate() {

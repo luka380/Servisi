@@ -1,11 +1,9 @@
 package com.project.prjx.Data.Mappers;
 
-import com.project.prjx.Data.Model.Dto.Restaurants.RestaurantDto;
 import com.project.prjx.Data.Model.Dto.Users.BaseUserDto;
 import com.project.prjx.Data.Model.Dto.Users.ClientDto;
 import com.project.prjx.Data.Model.Dto.Users.EmailDto;
 import com.project.prjx.Data.Model.Dto.Users.ManagerDto;
-import com.project.prjx.Data.Model.Entity.Restaurants.Restaurant;
 import com.project.prjx.Data.Model.Entity.Users.BaseUser;
 import com.project.prjx.Data.Model.Entity.Users.Client;
 import com.project.prjx.Data.Model.Entity.Users.Email;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 public class Mappers {
     public static ClientMapper ClientMapper = new ClientMapper();
     public static EmailMapper EmailMapper = new EmailMapper();
-    public static RestaurantMapper RestaurantMapper = new RestaurantMapper();
     public static ManagerMapper ManagerMapper = new ManagerMapper();
     public static BaseUserMapper BaseUserMapper = new BaseUserMapper();
 
@@ -24,7 +21,7 @@ public class Mappers {
 
         @Override
         public ClientDto map(Client object) {
-            if(object == null)
+            if (object == null)
                 return null;
             return ClientDto.builder()
                     .id(object.getId())
@@ -33,7 +30,6 @@ public class Mappers {
                     .birthday(object.getBirthday())
                     .firstName(object.getFirstName())
                     .lastName(object.getLastName())
-                    .phoneNumber(object.getPhoneNumber())
                     .isEnabled(object.getIsEnabled())
                     .password(object.getPassword())
                     .build();
@@ -41,7 +37,7 @@ public class Mappers {
 
         @Override
         public Client reverseMap(ClientDto object) {
-            if(object == null)
+            if (object == null)
                 return null;
             return Client.builder()
                     .id(object.getId())
@@ -50,7 +46,6 @@ public class Mappers {
                     .birthday(object.getBirthday())
                     .firstName(object.getFirstName())
                     .lastName(object.getLastName())
-                    .phoneNumber(object.getPhoneNumber())
                     .isEnabled(object.getIsEnabled())
                     .role(object.getRole())
                     .password(object.getPassword())
@@ -62,7 +57,7 @@ public class Mappers {
 
         @Override
         public BaseUserDto map(BaseUser object) {
-            if(object == null)
+            if (object == null)
                 return null;
             return ClientDto.builder()
                     .id(object.getId())
@@ -71,7 +66,6 @@ public class Mappers {
                     .birthday(object.getBirthday())
                     .firstName(object.getFirstName())
                     .lastName(object.getLastName())
-                    .phoneNumber(object.getPhoneNumber())
                     .isEnabled(object.getIsEnabled())
                     .password(object.getPassword())
                     .build();
@@ -79,7 +73,7 @@ public class Mappers {
 
         @Override
         public BaseUser reverseMap(BaseUserDto object) {
-            if(object == null)
+            if (object == null)
                 return null;
             return Client.builder()
                     .id(object.getId())
@@ -88,7 +82,6 @@ public class Mappers {
                     .birthday(object.getBirthday())
                     .firstName(object.getFirstName())
                     .lastName(object.getLastName())
-                    .phoneNumber(object.getPhoneNumber())
                     .isEnabled(object.getIsEnabled())
                     .role(object.getRole())
                     .password(object.getPassword())
@@ -101,19 +94,19 @@ public class Mappers {
 
         @Override
         public Email map(EmailDto object) {
-            if(object == null)
+            if (object == null)
                 return null;
 
             return Email.builder()
-                    .email(object.email())
+                    .email(object.getEmail())
                     .isVerified(object.isVerified())
-                    .id(object.id())
+                    .id(object.getId())
                     .build();
         }
 
         @Override
         public EmailDto reverseMap(Email object) {
-            if(object == null)
+            if (object == null)
                 return null;
             return EmailDto.builder()
                     .id(object.getId())
@@ -123,47 +116,18 @@ public class Mappers {
         }
     }
 
-    public static class RestaurantMapper implements Mapper<RestaurantDto, Restaurant> {
-
-        @Override
-        public Restaurant map(RestaurantDto object) {
-            if(object == null)
-                return null;
-            return Restaurant.builder()
-                    .address(object.address())
-                    .name(object.name())
-                    .phone(object.phone())
-                    .id(object.id())
-                    .build();
-        }
-
-        @Override
-        public RestaurantDto reverseMap(Restaurant object) {
-            if(object == null)
-                return null;
-            return RestaurantDto.builder()
-                    .address(object.getAddress())
-                    .name(object.getName())
-                    .phone(object.getPhone())
-                    .id(object.getId())
-                    .build();
-        }
-    }
-
     public static class ManagerMapper implements Mapper<ManagerDto, Manager> {
 
         @Override
         public Manager map(ManagerDto object) {
-            if(object == null)
+            if (object == null)
                 return null;
             return Manager.builder()
                     .hiringDate(object.getHiringDate())
-                    .restaurant(Mappers.RestaurantMapper.map(object.getRestaurant()))
                     .id(object.getId())
                     .birthday(object.getBirthday())
                     .firstName(object.getFirstName())
                     .lastName(object.getLastName())
-                    .phoneNumber(object.getPhoneNumber())
                     .isEnabled(object.getIsEnabled())
                     .role(object.getRole())
                     .email(Mappers.EmailMapper.map(object.getEmail()))
@@ -175,16 +139,14 @@ public class Mappers {
 
         @Override
         public ManagerDto reverseMap(Manager object) {
-            if(object == null)
+            if (object == null)
                 return null;
             return ManagerDto.builder()
                     .hiringDate(object.getHiringDate())
-                    .restaurant(Mappers.RestaurantMapper.reverseMap(object.getRestaurant()))
                     .id(object.getId())
                     .birthday(object.getBirthday())
                     .firstName(object.getFirstName())
                     .lastName(object.getLastName())
-                    .phoneNumber(object.getPhoneNumber())
                     .isEnabled(object.getIsEnabled())
                     .email(Mappers.EmailMapper.reverseMap(object.getEmail()))
                     .password(object.getPassword())

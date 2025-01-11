@@ -2,7 +2,7 @@ package com.project.prjx.Security;
 
 import com.project.prjx.Data.Model.Dto.Users.BaseUserDto;
 import com.project.prjx.Security.Tokens.JwtToken;
-import com.project.prjx.Services.BaseClientServiceInterface;
+import com.project.prjx.Services.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -17,17 +17,16 @@ public class JwtAuthProvider implements AuthenticationProvider {
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
-    private BaseClientServiceInterface<BaseUserDto> userService;
+    private MessageService userService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String token = authentication.getCredentials().toString();
 
         if (jwtUtils.isTokenValid(token)) {
-            BaseUserDto client = userService.getUserByUsername(jwtUtils.extractName(token));
+            BaseUserDto client = userService.getUser(jwtUtils.extractId(token).toString(), token);
 
-
-            if (client == null || client.getEmail().email().equals(jwtUtils.extractEmail(token)) || !client.getIsEnabled()) {
+            if (client == null || !client.getEmail().getEmail().equals(jwtUtils.extractEmail(token)) || !client.getIsEnabled()) {
                 return null;
             }
 
@@ -40,6 +39,8 @@ public class JwtAuthProvider implements AuthenticationProvider {
                     .isEnabled(client.getIsEnabled())
                     .build();
         }
+
+
         return null;
     }
 

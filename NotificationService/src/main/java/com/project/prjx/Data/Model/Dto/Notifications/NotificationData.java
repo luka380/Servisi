@@ -1,5 +1,7 @@
 package com.project.prjx.Data.Model.Dto.Notifications;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.project.prjx.Data.Model.MessageType;
@@ -30,8 +32,10 @@ public class NotificationData {
     private String receiverId;
     private String senderName;
     private String securityCode;
-    private int numberOfSeats;
+    private Integer numberOfSeats;
+    private Boolean isRead;
 
+    @JsonIgnore
     public HashMap<String, String> getPlaceholderValues() {
         HashMap<String, String> placeholderValues = new HashMap<>();
         placeholderValues.put("restaurant_name", restaurantName);
@@ -50,6 +54,7 @@ public class NotificationData {
         placeholderValues.put("sender_email", receiverEmail);
         placeholderValues.put("receiver_email", receiverEmail);
         placeholderValues.put("sender_phone", receiverPhone);
+        placeholderValues.put("is_read", String.valueOf(isRead));
         return placeholderValues;
     }
 }

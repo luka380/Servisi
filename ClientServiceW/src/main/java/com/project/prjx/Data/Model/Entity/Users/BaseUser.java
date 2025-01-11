@@ -28,26 +28,23 @@ public class BaseUser {
     private String firstName;
     @Column(nullable = false)
     private String lastName;
-    @Column(nullable = true)
-    private Number phoneNumber;
     @Column(nullable = false)
     private Boolean isEnabled;
     @Column(nullable = false)
     private String role;
 
-    public BaseUser(String username, String password, Email email, LocalDateTime birthday, String firstName, String lastName, Number phoneNumber, Boolean isEnabled) {
+    public BaseUser(String username, String password, Email email, LocalDateTime birthday, String firstName, String lastName, Boolean isEnabled) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.birthday = birthday;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
         this.isEnabled = isEnabled;
         this.role = "ROLE_USER";
     }
 
-    public BaseUser(UUID id, String username, String password, Email email, LocalDateTime birthday, String firstName, String lastName, Number phoneNumber, Boolean isEnabled, String role) {
+    public BaseUser(UUID id, String username, String password, Email email, LocalDateTime birthday, String firstName, String lastName, Boolean isEnabled, String role) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -55,7 +52,6 @@ public class BaseUser {
         this.birthday = birthday;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
         this.isEnabled = isEnabled;
         this.role = role;
     }
